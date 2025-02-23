@@ -1,0 +1,54 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            qemu-system-x86 \
+            qemu-system-arm \
+            xorriso \
+            libvirt-dev \
+            make \
+            mandoc \
+            man-db \
+            pandoc
+
+      - name: Build Documentation
+        run: make docs
+          
+      - name: Validate Documentation
+        run: make validate_docs
+
+      - name: Build Binary
+        run: make
+          
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bin/podman-bootc
+          draft: false
+          prerelease: false
+          generate_release_notes: true
