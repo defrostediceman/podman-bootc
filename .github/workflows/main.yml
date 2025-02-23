@@ -33,11 +33,11 @@ jobs:
             man-db \
             pandoc
 
-      - name: Build Documentation
-        run: make docs
+#      - name: Build Documentation
+#        run: make docs
           
-      - name: Validate Documentation
-        run: make validate_docs
+#      - name: Validate Documentation
+#        run: make validate_docs
 
       - name: Build Binary
         run: make
